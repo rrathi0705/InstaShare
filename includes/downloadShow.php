@@ -1,5 +1,6 @@
 <?php
 	session_start();
+	include_once 'dbh.inc.php';
 	$upload="false";
 	@$upload = $_GET['Upload'];
 ?>
@@ -22,6 +23,9 @@
 	*{
 		margin:0px;
 		padding: 0px;
+	}
+	.row{
+		margin:0;
 	}
 	.heading{
 		background-color: #eed;
@@ -52,14 +56,14 @@
 </style>
 <script type="text/javascript">
 	function logout(){
-		window.location.href="includes/logout.php";
+		window.location.href="logout.php";
 	}
 	$(document).ready(function(){
 		$( "#searchValue" ).autocomplete({
   			source: function( request, response ) {
 			   // Fetch data
 			   $.ajax({
-			    url: "search.php",
+			    url: "includes/search.php",
 			    type: 'post',
 			    dataType: "json",
 			    data: {
@@ -75,7 +79,7 @@
  		$(".hashtagCount").click(function(){
  			var x = $("#searchValue").val();
  			$.ajax({
-			    url: "includes/hashtagCount.php",
+			    url: "hashtagCount.php",
 			    type: 'post',
 			    data: {
 			     query: x
@@ -86,13 +90,10 @@
  		});
 		
 	});
-	function downloadShow(){
-		window.location.href="includes/downloadShow.php";
-	}
 </script>
 <body>
 	<div class="heading">
-		<span><img src="images/logo.jpg" style="width: 30px;">InstaShare</span>
+		<span><img src="../images/logo.jpg" style="width: 30px;">InstaShare</span>
 		<div class="menu">
 			<button class="btn btn-primary" onclick="logout()">LogOut</button>
 		</div>
@@ -100,13 +101,13 @@
 	<nav class="navbar navbar-expand-sm bg-light navbar-light">
 		<ul class="navbar-nav">
 		    <li class="nav-item">
-		      <a class="nav-link" href="home.php">Home</a>
+		      <a class="nav-link" href="../home.php">Home</a>
 		    </li>
 		    <li class="nav-item">
-		      <a class="nav-link" href="upload.php">Upload</a>
+		      <a class="nav-link" href="../upload.php">Upload</a>
 		    </li>
 		    <li class="nav-item">
-		      <a class="nav-link" href="myuploads.php">My Images</a>
+		      <a class="nav-link" href="../myuploads.php">My Images</a>
 		    </li>
 		    <li class="nav-item dropdown">
 		        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -119,10 +120,10 @@
 		        </div>
 		    </li>
 		    <li class="nav-item">
-		      <a class="nav-link" href="includes/downloadShow.php">Analytics</a>
+		      <a class="nav-link" href="downloadShow.php">Analytics</a>
 		    </li>
 		</ul>
-	  	<form class="form-inline search" action="includes/searchResult.php" method="POST">
+	  	<form class="form-inline search" action="searchResult.php" method="POST">
     		<input class="form-control" type="text" placeholder="Search Images" style="width: 350px; margin-right: 20px;" id="searchValue" name="searchedString" required>
     		<button class="btn btn-success hashtagCount" type="submit" name="submit">Search</button>
   		</form>
@@ -134,7 +135,7 @@
 				      	<h5 class="modal-title" id="exampleModalLabel">Filter According to UserName</h5>
 				    </div>
 			      	<div class="modal-body">
-			        	<form method="post" action="filter.php">
+			        	<form method="post" action="../filter.php">
 			        		<label>UserName</label>
 			        		<input type="text" name="username" class="form-control">
 			        		<button type="submit" name="filterAccount" class="btn btn-primary" style="margin-top: 10px;">Filter</button>
@@ -152,7 +153,7 @@
 				      	<h5 class="modal-title" id="exampleModalLabel">Filter According to Date</h5>
 				    </div>
 			      	<div class="modal-body">
-			        	<form method="post" action="filter.php">
+			        	<form method="post" action="../filter.php">
 			        		<label>From</label>
 			        		<input type="date" name="from" class="form-control" required>
 			        		<label>To</label>
@@ -184,5 +185,62 @@
 	<?php if($upload=='true'){
 			echo '<p class="alert alert-success" style="width:400px; margin:auto; margin-top:10px;">Uploaded Successfully</p>';
 		}?>
+	<div class="row">
+		<div class="col-sm-6">
+			<h3 class="text-center">Download</h3>
+			<table class="table">
+				<tr>
+					<th>Sr no.</th>
+					<th>Image</th>
+					<th>Count</th>
+				</tr>
+	<?php 
+			$i=0;
+			$sql = "SELECT * from download";
+			$result = mysqli_query($conn,$sql);
+			if(mysqli_num_rows($result)>0){
+				while($row = mysqli_fetch_array($result)){
+					$i++;
+	?>
+				<tr>
+					<td><?php echo $i;?></td>
+					<td><img src="<?php echo $row['image'];?>" width=100px;></td>
+					<td><?php echo $row['count'];?></td>
+				</tr>
+	<?php
+				}
+			}
+	?>
+				
+			</table>
+		</div>
+		<div class="col-sm-6">
+			<h3 class="text-center">HashTag</h3>
+			<table class="table">
+				<tr>
+					<th>Sr no.</th>
+					<th>HashTag</th>
+					<th>Count</th>
+				</tr>
+	<?php 
+			$i=0;
+			$sql = "SELECT * from hashtagcount";
+			$result = mysqli_query($conn,$sql);
+			if(mysqli_num_rows($result)>0){
+				while($row = mysqli_fetch_array($result)){
+					$i++;
+	?>
+				<tr>
+					<td><?php echo $i;?></td>
+					<td><?php echo $row['hashtag'];?></td>
+					<td><?php echo $row['count'];?></td>
+				</tr>
+	<?php
+				}
+			}
+	?>
+			</table>
+		</div>
+	</div>
 </body>
 </html>

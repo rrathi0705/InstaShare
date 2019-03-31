@@ -24,7 +24,6 @@ CREATE table download (
 	image varchar(255),
 	count int(100)
 );
-
 CREATE table hashtagCount (
 	pid int(100) AUTO_INCREMENT primary key,
 	hashtag varchar(255),
